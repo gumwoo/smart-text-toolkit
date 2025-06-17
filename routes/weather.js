@@ -4,7 +4,7 @@ const router = express.Router();
 
 // 기상청 API 설정
 const WEATHER_API_CONFIG = {
-  baseURL: 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0',
+  baseURL: 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0',
   // 실제 제공받은 인코딩된 키와 디코딩된 키
   serviceKeys: {
     encoded: 'Lmc1Zq9hmKIACiZKiXehoeHi1ac4HG25EqROFy%2F%2FOkLBLhn5EWFL0X38pRF%2BFWvlRuRHJx7N79cf7zcsRUz%2BNA%3D%3D',

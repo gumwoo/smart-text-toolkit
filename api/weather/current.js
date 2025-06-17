@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     const { nx = 60, ny = 127 } = req.query; // 기본값: 서울
     
-    const API_KEY = process.env.WEATHER_API_KEY || 'dXpC5DY7AuPeOdYqR%2BG%2FHgKB6IksYE1y9OgQ8CxBDjOGe7BhKgK5qGNj6oWJ2L4ORMKqo9QFHKm0oT%2F7n%2FLGIQ%3D%3D';
+    const API_KEY = process.env.WEATHER_API_KEY || 'Lmc1Zq9hmKIACiZKiXehoeHi1ac4HG25EqROFy%2F%2FOkLBLhn5EWFL0X38pRF%2BFWvlRuRHJx7N79cf7zcsRUz%2BNA%3D%3D';
     
     // 현재 시간 정보
     const now = new Date();
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     const hour = now.getHours();
     const baseTime = String(hour).padStart(2, '0') + '00';
     
-    const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst';
+    const url = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst';
     const params = {
       serviceKey: decodeURIComponent(API_KEY),
       pageNo: 1,

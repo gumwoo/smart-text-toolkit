@@ -6,6 +6,9 @@
   "directories": {
     "doc": "docs"
   },
+  "engines": {
+    "node": ">=18.x"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
