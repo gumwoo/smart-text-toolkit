@@ -5,6 +5,18 @@ const TextSummarizer = ({ setIsLoading, addNotification }) => {
   const [summary, setSummary] = useState('');
   const [summaryLength, setSummaryLength] = useState('medium');
 
+  // 마크다운 문법 제거 함수 (** 굵게와 ### 제목만 제거)
+  const removeMarkdown = (text) => {
+    if (!text) return '';
+    
+    return text
+      // ### 제목 제거
+      .replace(/^#{1,6}\s+/gm, '')
+      // ** 굵게 문법 제거
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .trim();
+  };
+
   const lengthOptions = [
     { value: 'short', label: '짧게 (1-2 문장)', description: '핵심만 간단히' },
     { value: 'medium', label: '보통 (3-5 문장)', description: '주요 내용 요약' },
@@ -43,9 +55,10 @@ const TextSummarizer = ({ setIsLoading, addNotification }) => {
       }
 
       const data = await response.json();
-      setSummary(data.summary);
+      const cleanSummary = removeMarkdown(data.summary);
+      setSummary(cleanSummary);
       addNotification('텍스트 요약이 완료되었습니다!', 'success');
-      console.log('요약 생성 완료:', data.summary);
+      console.log('요약 생성 완료:', cleanSummary);
       
     } catch (error) {
       console.error('요약 생성 오류:', error);

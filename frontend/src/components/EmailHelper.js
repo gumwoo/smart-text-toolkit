@@ -8,6 +8,18 @@ const EmailHelper = ({ setIsLoading, addNotification }) => {
   const [keyPoints, setKeyPoints] = useState('');
   const [generatedEmail, setGeneratedEmail] = useState('');
 
+  // 마크다운 문법 제거 함수 (** 굵게와 ### 제목만 제거)
+  const removeMarkdown = (text) => {
+    if (!text) return '';
+    
+    return text
+      // ### 제목 제거
+      .replace(/^#{1,6}\s+/gm, '')
+      // ** 굵게 문법 제거
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .trim();
+  };
+
   const emailTypes = [
     { value: 'business', label: '비즈니스', description: '업무 관련 이메일' },
     { value: 'inquiry', label: '문의', description: '정보 요청 및 질문' },
@@ -55,7 +67,8 @@ const EmailHelper = ({ setIsLoading, addNotification }) => {
       }
 
       const data = await response.json();
-      setGeneratedEmail(data.email);
+      const cleanEmail = removeMarkdown(data.email);
+      setGeneratedEmail(cleanEmail);
       addNotification('이메일이 생성되었습니다!', 'success');
       console.log('이메일 생성 완료');
       

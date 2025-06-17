@@ -28,14 +28,59 @@ const openai = new OpenAI({
 });
 
 // 미들웨어 설정
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3005', 
+    'http://localhost:3006',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3005',
+    'http://127.0.0.1:3006'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// 모든 요청 로깅
+app.use((req, res, next) => {
+  console.log(`📝 Request: ${req.method} ${req.path} (${req.originalUrl})`);
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: accessLogStream }));
 
-// 라우터 설정
-const weatherRouter = require('./routes/weather');
-app.use('/api/weather', weatherRouter);
+// 라우터 설정 (다른 라우트보다 먼저!)
+console.log('🔍 Loading weather router...');
+try {
+  console.log('🔍 Requiring ./routes/weather...');
+  const weatherRouter = require('./routes/weather');
+  console.log('✅ Weather router required successfully');
+  console.log('🔍 Weather router type:', typeof weatherRouter);
+  console.log('🔍 Weather router keys:', Object.keys(weatherRouter || {}));
+  
+  console.log('🔍 Mounting weather router...');
+  app.use('/api/weather', weatherRouter);
+  console.log('✅ Weather router mounted at /api/weather');
+  
+  // 직접 테스트 라우터 추가 (비교용)
+  app.get('/api/weather/direct-test', (req, res) => {
+    console.log('🎯 Direct test route called!');
+    res.json({ success: true, message: 'Direct route working!' });
+  });
+  
+} catch (error) {
+  console.error('❌ Weather router loading failed:', error.message);
+  console.error('❌ Stack trace:', error.stack);
+  
+  // 임시 대체 라우터
+  console.log('🔧 Creating fallback router...');
+  app.get('/api/weather/test', (req, res) => {
+    res.json({ success: true, message: 'Fallback router working' });
+  });
+}
 
 // AI 날씨 코디네이터 API 추가
 app.post('/api/weather-advisor', async (req, res) => {
@@ -53,7 +98,7 @@ app.post('/api/weather-advisor', async (req, res) => {
 
     switch (advisorType) {
       case 'outfit':
-        systemMessage = '당신은 날씨 전문가이자 패션 코디네이터입니다. 현재 날씨 조건에 맞는 실용적이고 스타일리시한 옷차림을 추천해주세요.';
+        systemMessage = '당신은 날씨 전문가이자 패션 코디네이터입니다. 현재 날씨 조건에 맞는 실용적이고 스타일리시한 옷차림을 추천해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.';
         prompt = `현재 날씨 정보:
 - 기온: ${weatherData.temperature}
 - 습도: ${weatherData.humidity}
@@ -62,11 +107,12 @@ app.post('/api/weather-advisor', async (req, res) => {
 - 하늘상태: ${weatherData.sky || '정보 없음'}
 
 이 날씨에 맞는 옷차림과 외출 준비물을 추천해주세요. 
-상의, 하의, 외투, 신발, 액세서리, 준비물로 나누어서 구체적으로 설명해주세요.`;
+상의, 하의, 외투, 신발, 액세서리, 준비물로 나누어서 구체적으로 설명해주세요.
+답변할 때 **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
         break;
         
       case 'activity':
-        systemMessage = '당신은 날씨 기반 활동 추천 전문가입니다. 현재 날씨 조건에 최적화된 실내외 활동을 제안해주세요.';
+        systemMessage = '당신은 날씨 기반 활동 추천 전문가입니다. 현재 날씨 조건에 최적화된 실내외 활동을 제안해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.';
         prompt = `현재 날씨 정보:
 - 기온: ${weatherData.temperature}
 - 습도: ${weatherData.humidity}
@@ -74,11 +120,12 @@ app.post('/api/weather-advisor', async (req, res) => {
 - 강수형태: ${weatherData.precipitationType}
 
 이 날씨에 적합한 활동들을 실내활동 3가지, 실외활동 3가지로 나누어 추천해주세요.
-각 활동의 이유와 주의사항도 함께 설명해주세요.`;
+각 활동의 이유와 주의사항도 함께 설명해주세요.
+답변할 때 **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
         break;
         
       case 'health':
-        systemMessage = '당신은 날씨와 건강의 상관관계를 잘 아는 건강 조언 전문가입니다. 현재 날씨 조건에서 주의해야 할 건강 관리법을 제공해주세요.';
+        systemMessage = '당신은 날씨와 건강의 상관관계를 잘 아는 건강 조언 전문가입니다. 현재 날씨 조건에서 주의해야 할 건강 관리법을 제공해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.';
         prompt = `현재 날씨 정보:
 - 기온: ${weatherData.temperature}
 - 습도: ${weatherData.humidity}
@@ -86,7 +133,8 @@ app.post('/api/weather-advisor', async (req, res) => {
 - 강수형태: ${weatherData.precipitationType}
 
 이 날씨 조건에서 주의해야 할 건강 관리 요령을 알려주세요.
-수분 섭취, 피부 관리, 호흡기 건강, 운동 시 주의사항 등을 포함해서 설명해주세요.`;
+수분 섭취, 피부 관리, 호흡기 건강, 운동 시 주의사항 등을 포함해서 설명해주세요.
+답변할 때 **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
         break;
         
       default:
@@ -165,14 +213,14 @@ app.post('/api/generate-quote', async (req, res) => {
       return res.status(400).json({ error: '카테고리가 필요합니다.' });
     }
 
-    const prompt = `${category}에 관한 영감을 주는 명언을 하나 생성해주세요. 한국어로 작성하고, 따옴표 없이 명언만 반환해주세요.`;
+    const prompt = `${category}에 관한 영감을 주는 명언을 하나 생성해주세요. 한국어로 작성하고, 따옴표 없이 명언만 반환해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: '당신은 영감을 주는 명언을 생성하는 전문가입니다. 간결하고 의미 있는 명언을 만들어주세요.'
+          content: '당신은 영감을 주는 명언을 생성하는 전문가입니다. 간결하고 의미 있는 명언을 만들어주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.'
         },
         {
           role: 'user',
@@ -221,14 +269,14 @@ app.post('/api/summarize-text', async (req, res) => {
         lengthInstruction = '3-5 문장으로 적절히';
     }
 
-    const prompt = `다음 텍스트를 ${lengthInstruction} 요약해주세요. 핵심 내용만 포함하고 한국어로 작성해주세요.\n\n텍스트:\n${text}`;
+    const prompt = `다음 텍스트를 ${lengthInstruction} 요약해주세요. 핵심 내용만 포함하고 한국어로 작성해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.\n\n텍스트:\n${text}`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: '당신은 텍스트 요약 전문가입니다. 주어진 텍스트의 핵심 내용을 명확하고 간결하게 요약해주세요.'
+          content: '당신은 텍스트 요약 전문가입니다. 주어진 텍스트의 핵심 내용을 명확하고 간결하게 요약해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.'
         },
         {
           role: 'user',
@@ -315,14 +363,14 @@ app.post('/api/generate-email', async (req, res) => {
 목적: ${purpose}
 어조: ${toneInstruction}${keyPointsText}
 
-한국어로 작성하고, 제목과 본문을 모두 포함하여 실제 이메일 형식으로 작성해주세요.`;
+한국어로 작성하고, 제목과 본문을 모두 포함하여 실제 이메일 형식으로 작성해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: '당신은 전문적인 이메일 작성 도우미입니다. 상황에 맞는 적절한 이메일을 작성해주세요.'
+          content: '당신은 전문적인 이메일 작성 도우미입니다. 상황에 맞는 적절한 이메일을 작성해주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.'
         },
         {
           role: 'user',
@@ -402,14 +450,14 @@ app.post('/api/generate-creative', async (req, res) => {
 
 주제: ${prompt}${keywordsText}
 
-한국어로 작성하고, 창의적이고 매력적인 내용으로 만들어주세요.`;
+한국어로 작성하고, 창의적이고 매력적인 내용으로 만들어주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: '당신은 창의적인 글쓰기 전문가입니다. 독창적이고 매력적인 콘텐츠를 만들어주세요.'
+          content: '당신은 창의적인 글쓰기 전문가입니다. 독창적이고 매력적인 콘텐츠를 만들어주세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 답변해주세요.'
         },
         {
           role: 'user',
@@ -440,8 +488,19 @@ app.use((error, req, res, next) => {
 
 // 404 처리
 app.use((req, res) => {
-  logInfo(`404 요청: ${req.method} ${req.path}`);
-  res.status(404).json({ error: '요청한 리소스를 찾을 수 없습니다.' });
+  console.log(`❌ 404 Error Details:`);
+  console.log(`   Method: ${req.method}`);
+  console.log(`   Path: ${req.path}`);
+  console.log(`   Original URL: ${req.originalUrl}`);
+  console.log(`   Query: ${JSON.stringify(req.query)}`);
+  
+  logInfo(`404 요청: ${req.method} ${req.path} (Original: ${req.originalUrl})`);
+  res.status(404).json({ 
+    success: false,
+    error: `Route not found: ${req.originalUrl}`,
+    method: req.method,
+    path: req.path
+  });
 });
 
 // 서버 시작

@@ -5,6 +5,18 @@ const QuoteGenerator = ({ setIsLoading, addNotification }) => {
   const [selectedCategory, setSelectedCategory] = useState('영감');
   const [customTopic, setCustomTopic] = useState('');
 
+  // 마크다운 문법 제거 함수 (** 굵게와 ### 제목만 제거)
+  const removeMarkdown = (text) => {
+    if (!text) return '';
+    
+    return text
+      // ### 제목 제거
+      .replace(/^#{1,6}\s+/gm, '')
+      // ** 굵게 문법 제거
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .trim();
+  };
+
   const categories = [
     '영감', '동기부여', '성공', '사랑', '인생', '지혜', 
     '도전', '희망', '꿈', '리더십', '자신감', '행복'
@@ -35,9 +47,10 @@ const QuoteGenerator = ({ setIsLoading, addNotification }) => {
       }
 
       const data = await response.json();
-      setQuote(data.quote);
+      const cleanQuote = removeMarkdown(data.quote);
+      setQuote(cleanQuote);
       addNotification('새로운 명언이 생성되었습니다!', 'success');
-      console.log('명언 생성 완료:', data.quote);
+      console.log('명언 생성 완료:', cleanQuote);
       
     } catch (error) {
       console.error('명언 생성 오류:', error);

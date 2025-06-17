@@ -56,15 +56,15 @@ router.post('/generate', async (req, res) => {
 
     // OpenAI API 호출
     const prompt = language === 'korean' 
-      ? `${category} 주제로 한국어 명언을 하나 생성해주세요. 짧고 인상적인 문구로 만들어주세요. 작성자는 포함하지 마세요.`
-      : `Generate one ${category} quote in English. Make it short and impactful. Don't include the author.`;
+      ? `${category} 주제로 한국어 명언을 하나 생성해주세요. 짧고 인상적인 문구로 만들어주세요. 작성자는 포함하지 마세요. **굵게**나 ###제목 같은 마크다운 문법을 사용하지 말고 일반 텍스트로만 작성해주세요.`
+      : `Generate one ${category} quote in English. Make it short and impactful. Don't include the author. Do not use **bold** or ###headings markdown syntax. Respond only in plain text.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: 'You are a wise quote generator. Create meaningful and inspiring quotes.'
+          content: 'You are a wise quote generator. Create meaningful and inspiring quotes. Do not use **bold** or ###headings markdown syntax. Respond only in plain text.'
         },
         {
           role: 'user',

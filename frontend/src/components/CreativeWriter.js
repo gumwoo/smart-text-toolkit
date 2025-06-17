@@ -8,6 +8,18 @@ const CreativeWriter = ({ setIsLoading, addNotification }) => {
   const [keywords, setKeywords] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
 
+  // 마크다운 문법 제거 함수 (** 굵게와 ### 제목만 제거)
+  const removeMarkdown = (text) => {
+    if (!text) return '';
+    
+    return text
+      // ### 제목 제거
+      .replace(/^#{1,6}\s+/gm, '')
+      // ** 굵게 문법 제거
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .trim();
+  };
+
   const contentTypes = [
     { value: 'story', label: '짧은 이야기', description: '소설이나 단편 스토리' },
     { value: 'idea', label: '아이디어 브레인스토밍', description: '창의적 아이디어 생성' },
@@ -62,7 +74,8 @@ const CreativeWriter = ({ setIsLoading, addNotification }) => {
       }
 
       const data = await response.json();
-      setGeneratedContent(data.content);
+      const cleanContent = removeMarkdown(data.content);
+      setGeneratedContent(cleanContent);
       addNotification('창의적 콘텐츠가 생성되었습니다!', 'success');
       console.log('창의적 콘텐츠 생성 완료');
       

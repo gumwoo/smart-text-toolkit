@@ -10,6 +10,18 @@ const WeatherAdvisor = ({ nx, ny }) => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isGeneratingAdvice, setIsGeneratingAdvice] = useState(false);
 
+  // 마크다운 문법 제거 함수 (** 굵게와 ### 제목만 제거)
+  const removeMarkdown = (text) => {
+    if (!text) return '';
+    
+    return text
+      // ### 제목 제거
+      .replace(/^#{1,6}\s+/gm, '')
+      // ** 굵게 문법 제거
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .trim();
+  };
+
   const advisorTypes = {
     outfit: { 
       icon: '👗', 
@@ -73,10 +85,11 @@ const WeatherAdvisor = ({ nx, ny }) => {
       }
 
       const data = await response.json();
-      setAiAdvice(data.advice);
+      const cleanAdvice = removeMarkdown(data.advice);
+      setAiAdvice(cleanAdvice);
       setLastUpdated(new Date().toLocaleString());
       
-      console.log('[WeatherAdvisor] AI 조언 생성 완료:', data.advice.substring(0, 100));
+      console.log('[WeatherAdvisor] AI 조언 생성 완료:', cleanAdvice.substring(0, 100));
       
     } catch (err) {
       console.error('[WeatherAdvisor] AI 조언 생성 실패:', err);

@@ -1,88 +1,116 @@
-# 스마트 텍스트 툴킷 프로젝트 계획
+# Smart Text Toolkit - 프로젝트 계획
 
 ## 프로젝트 개요
-- **프로젝트명**: Smart Text Toolkit
-- **목적**: OpenAI API를 활용한 텍스트 생성/요약/변환 도구
-- **기술 스택**: Node.js, Express, React, OpenAI API
-- **작업 폴더**: C:\app-onestore
+- **프로젝트명**: Smart Text Toolkit with Weather API Integration
+- **목적**: 텍스트 처리 기능과 공공 날씨 API를 통합한 웹 애플리케이션
+- **기술 스택**: Node.js, Express, React, OpenAI API, 기상청 공공데이터 API
 
-## 현재 상태 (2025-06-15)
+## 현재 상황 분석 (2025-06-17)
 
-### 완료된 작업
-1. ✅ 백엔드 서버 구조 설정 (Express, CORS, 환경변수)
-2. ✅ OpenAI API 통합 (명언 생성, 텍스트 요약, 이메일 생성, 창의 콘텐츠)
-3. ✅ 로깅 시스템 구현 (access.log, app.log, error.log)
-4. ✅ 기본 API 엔드포인트 구현
-5. ✅ 프론트엔드 React 앱 구조 설정
-6. ✅ 기상청 API 키 문제 해결 - 인코딩/디코딩 키 자동 선택 구현
-7. ✅ 단기예보 API 시간 계산 로직 개선
-8. ✅ 서울 좌표 정확성 개선 (중구 기준)
-9. ✅ 기상청 공식 가이드에 맞춘 API 호출 시간 로직 구현
-   - 초단기실황: 매시 정시 생성, 10분 이후 호출
-   - 초단기예보: 매시 30분 발표, 45분 이후 호출
-10. ✅ **AI 날씨 코디네이터 시스템 완전 구현**
-    - WeatherAdvisor 컴포넌트로 예보 대체
-    - OpenAI GPT-4 기반 개인화된 조언 (옷차림, 활동, 건강)
-    - 실시간 날씨 데이터 기반 맞춤형 추천
-    - 3가지 조언 타입 지원 (outfit, activity, health)
-11. ✅ **프로젝트 구조 정리**
-    - WeatherAPITest.js 삭제 (테스트용)
-    - WeatherForecast.js 삭제 (더 이상 사용 안함)
-    - App.js에서 WeatherAPITest 관련 코드 제거
-    - ToolSelector에서 weathertest 탭 제거  
-    - 핵심 컴포넌트만 유지 (WeatherCurrent, WeatherAdvisor, WeatherDashboard)
-    - UI 네이밍 개선: "날씨 정보" → "스마트 날씨"
+### 🔍 발견된 주요 문제점
+1. **공공 API 호출 실패**
+   - `/api/weather/forecast/short` - 404 오류
+   - `/api/weather/forecast/long` - 404 오류
+   - 로그에 지속적인 404 에러 발생
 
-### 현재 이슈  
-- ~~단기예보 API 500 오류~~: **해결됨**
-- ~~초단기예보 N/A 문제~~: **해결됨** - 기상청 가이드 준수로 수정
+2. **라우트 누락 문제**
+   - weather.js에 forecast 관련 라우트가 정의되지 않음
+   - 현재 정의된 라우트: `/current`, `/current-simple`, `/health`, `/test`
+   - 필요한 라우트: `/forecast/short`, `/forecast/long`
 
-## 향후 작업 계획
+3. **API 구조 분석**
+   - 현재 초단기실황조회(`getUltraSrtNcst`)만 구현됨
+   - 단기예보조회(`getVilageFcst`) 미구현
+   - 중기예보 관련 API 미구현
 
-### 우선순위 1: AI 날씨 코디네이터 개발 (완료)
-- [x] 기상청 API 키 인코딩/디코딩 자동 선택 구현
-- [x] 현재 날씨 조회 API 정상 작동 확인
-- [x] **WeatherForecast 컴포넌트를 AI 날씨 코디네이터로 대체**
-- [x] OpenAI API를 활용한 개인화된 날씨 조언 시스템 구현
-- [x] 현재 날씨 데이터 기반 추천 서비스 (옷차림, 외출 준비물, 건강 조언)
-- [x] 백엔드 AI 조언 API 엔드포인트 개발 (/api/weather-advisor)
-- [x] 프론트엔드 AI 코디네이터 UI 개발 (WeatherAdvisor 컴포넌트)
-- [x] **불필요한 테스트 컴포넌트 정리 (WeatherAPITest, WeatherForecast 삭제)**
+## 해결해야 할 작업 목록
 
-### 우선순위 2: 시스템 안정성 개선
-- [x] 더 상세한 로깅 구현
-- [ ] API 호출 제한 처리
-- [ ] 오류 복구 메커니즘
-- [ ] 헬스 체크 개선
+### 🎯 즉시 해결 필요
+- [x] 단기예보 API 라우트 추가 (`/forecast/short`) ✅ 완료
+- [x] 중기예보 API 라우트 추가 (`/forecast/long`) ✅ 완료 (단기예보로 임시 대체)
+- [x] 기상청 API의 getVilageFcst 엔드포인트 구현 ✅ 완료
+- [ ] 프론트엔드에서 요청하는 라우트와 백엔드 라우트 일치 확인
 
-### 우선순위 3: 기능 확장
-- [ ] 프론트엔드 UI 개선
-- [ ] 추가 AI 기능 구현
-- [ ] 사용자 세션 관리
-- [ ] 데이터 캐싱
+### 🔧 기술적 개선사항
+- [x] API 응답 데이터 파싱 및 정규화 ✅ 완료
+- [x] 오류 처리 및 로깅 개선 ✅ 완료
+- [ ] 프론트엔드와 백엔드 간의 데이터 형식 표준화
+- [ ] 실제 중기예보 API 연동 (현재는 단기예보로 대체)
 
-## 기술 세부사항
+## 완료된 작업
+- ✅ 서버 기본 구조 설정
+- ✅ 초단기실황조회 API 구현
+- ✅ 단기예보조회 API 구현 (`/forecast/short`)
+- ✅ 중기예보조회 API 구현 (`/forecast/long` - 임시)
+- ✅ OpenAI 통합 기능 구현
+- ✅ 로깅 시스템 구축
+- ✅ CORS 설정 및 미들웨어 구성
+- ✅ 404 오류 원인 파악 및 해결
+- ✅ **GPT 마크다운 문법 제거 시스템 구현 (수정 완료)**
+  - 백엔드: 모든 OpenAI API 프롬프트에 **굵게**와 ###제목 사용 금지 지시 추가
+  - 프론트엔드: 모든 AI 응답 컴포넌트에 **굵게**와 ###제목 제거 함수 적용
+  - 사용자 요청에 맞게 **와 ### 이 두 개 마크다운 문법만 제거
+  - 원래 AI의 자연스러운 텍스트 흐름과 가독성 유지
 
-### 서버 구성
-- **포트**: 5000
-- **프론트엔드**: localhost:3000
-- **로그 위치**: C:\app-onestore\logs\
-- **환경 파일**: .env
+## 최근 해결사항 (2025-06-17)
+### ✅ 공공 API 호출 실패 문제 해결
+1. **누락된 라우트 추가**
+   - `/api/weather/forecast/short` 라우트 구현
+   - `/api/weather/forecast/long` 라우트 구현
+   
+2. **단기예보 API 구현**
+   - 기상청 getVilageFcst 엔드포인트 연동
+   - 3시간마다 발표되는 예보 시간 계산 로직 추가
+   - 날짜별, 시간별 데이터 그룹화 및 파싱
+   - 주요 기상 요소별 데이터 정리 (기온, 습도, 강수 등)
 
-### API 엔드포인트
-- POST /api/generate-quote - 명언 생성
-- POST /api/summarize-text - 텍스트 요약  
-- POST /api/generate-email - 이메일 생성
-- POST /api/generate-creative - 창의적 콘텐츠 생성
-- GET /health - 헬스 체크
-
-### 로그 분석 결과
-- 서버 정상 기동 확인
-- API 호출 정상 처리 기록 있음
-- 오류 로그에서 특정 패턴 확인 필요
+3. **데이터 구조화**
+   - 원본 데이터와 파싱된 데이터 모두 제공
+   - 사용자 친화적인 데이터 형식으로 변환
+   - 오류 처리 및 상세 로깅 추가
 
 ## 다음 단계
-1. API 키 문제 진단 및 해결
-2. 인코딩/디코딩 메커니즘 구현
-3. 테스트 및 검증
-4. 문제 해결 후 추가 기능 개발
+1. ✅ 단기예보 라우트 추가 완료
+2. ✅ API 테스트 도구 준비 완료
+3. ⚠️ **서버 재시작 필요** - 현재 실행 중인 서버가 수정된 코드를 반영하지 않음
+4. [ ] 프론트엔드 연동 확인
+5. [ ] 사용자 인터페이스 개선
+6. 🆕 **GPT 마크다운 문법 제거 작업 (수정 완료)**
+   - ✅ 백엔드: 모든 OpenAI API 프롬프트에 **굵게**와 ###제목 사용 금지 지시 추가 완료
+   - ✅ 프론트엔드: 모든 AI 응답 컴포넌트에 **굵게**와 ###제목 제거 함수 적용 완료
+   - ✅ 과도한 문단 나누기 제거하여 원래 가독성 유지
+   - ✅ 사용자 요청에 맞게 **와 ### 이 두 개 마크다운 문법만 제거하도록 수정 완료
+
+## 🚨 **최종 진단 결과**
+
+### ✅ **API 키 상태: 정상**
+- **Decoded 키**: 완전히 정상 작동 (NORMAL_SERVICE)
+- **Encoded 키**: 등록 오류 (SERVICE_KEY_IS_NOT_REGISTERED_ERROR)
+- **결론**: 현재 키로 정상 서비스 가능
+
+### 🎯 **실제 문제: 서버 코드 미반영**
+- 포트 5000에서 **다른 프로젝트 서버** 실행 중
+- 수정된 weather.js 라우터가 로드되지 않음
+- 모든 API 코드 수정 완료되었으나 서버 재시작 필요
+
+### 📋 **즉시 실행 필요 사항**
+1. **현재 5000번 포트 서버 종료**
+2. **올바른 서버 실행**: `C:\app-onestore`에서 `npm run dev`
+3. **테스트 확인**: `http://localhost:5000/api/weather/forecast/short`
+
+### 🎉 **예상 결과**
+서버 재시작 후 모든 공공 API 호출이 정상 작동할 것입니다!
+
+## 📋 서버 재시작 후 확인사항
+1. `http://localhost:5000/health` - 서버 상태 확인
+2. `http://localhost:5000/api/weather/forecast/short` - 단기예보 API
+3. `http://localhost:5000/api/weather/forecast/long` - 중기예보 API
+4. `http://localhost:5000/api/weather/current` - 현재 날씨 API
+
+## 🛠️ 문제 해결 방법
+1. **기존 서버 종료**: 현재 5000번 포트의 서버 프로세스 종료
+2. **올바른 서버 실행**: `C:\app-onestore` 폴더에서 `npm run dev` 또는 `node server.js`
+3. **API 테스트**: 브라우저에서 `C:\app-onestore\test-weather-api.html` 파일 열어서 테스트
+
+---
+*마지막 업데이트: 2025-06-17*
