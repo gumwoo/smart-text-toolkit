@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const QuoteGenerator = ({ setIsLoading, addNotification }) => {
   const [quote, setQuote] = useState('');
@@ -34,7 +35,7 @@ const QuoteGenerator = ({ setIsLoading, addNotification }) => {
     
     try {
       const topic = customTopic.trim() || selectedCategory;
-      const response = await fetch('http://localhost:5000/api/generate-quote', {
+      const response = await fetch(API_ENDPOINTS.GENERATE_QUOTE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

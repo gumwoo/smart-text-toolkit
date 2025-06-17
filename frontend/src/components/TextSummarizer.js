@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const TextSummarizer = ({ setIsLoading, addNotification }) => {
   const [inputText, setInputText] = useState('');
@@ -39,7 +40,7 @@ const TextSummarizer = ({ setIsLoading, addNotification }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/summarize-text', {
+      const response = await fetch(API_ENDPOINTS.SUMMARIZE_TEXT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

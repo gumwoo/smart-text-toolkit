@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const EmailHelper = ({ setIsLoading, addNotification }) => {
   const [emailType, setEmailType] = useState('business');
@@ -48,7 +49,7 @@ const EmailHelper = ({ setIsLoading, addNotification }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/generate-email', {
+      const response = await fetch(API_ENDPOINTS.GENERATE_EMAIL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

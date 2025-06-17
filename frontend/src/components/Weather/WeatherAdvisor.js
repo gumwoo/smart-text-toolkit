@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import weatherAPI from '../../services/weatherAPI';
+import { API_ENDPOINTS } from '../../config/api';
 
 const WeatherAdvisor = ({ nx, ny }) => {
   const [currentWeather, setCurrentWeather] = useState(null);
@@ -63,7 +64,7 @@ const WeatherAdvisor = ({ nx, ny }) => {
       setIsGeneratingAdvice(true);
       setError(null);
 
-      const response = await fetch('http://localhost:5000/api/weather-advisor', {
+      const response = await fetch(API_ENDPOINTS.WEATHER_ADVISOR, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

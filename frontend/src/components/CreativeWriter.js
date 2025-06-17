@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const CreativeWriter = ({ setIsLoading, addNotification }) => {
   const [contentType, setContentType] = useState('story');
@@ -55,7 +56,7 @@ const CreativeWriter = ({ setIsLoading, addNotification }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/generate-creative', {
+      const response = await fetch(API_ENDPOINTS.GENERATE_CREATIVE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
