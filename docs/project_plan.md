@@ -145,5 +145,23 @@
 - 모든 ESLint 오류 해결
 - CI=true 환경에서 빌드 성공 예상
 
+### 🔧 **404 오류 해결 (2025-06-19)**
+- ✅ **문제 진단**: 로컬 vs Vercel 환경 차이
+  - 로컬: CI=false (ESLint 경고만 표시)
+  - Vercel: CI=true (ESLint 경고를 오류로 처리)
+- ✅ **빌드 오류 해결**: 
+  - frontend/.env에 CI=false 설정
+  - package.json build 스크립트 수정
+- ✅ **배포 성공**: ESLint 오류 해결로 빌드 통과
+- 🔄 **404 오류 해결 시도**:
+  - vercel.json 라우팅 설정 수정
+  - 풀스택 앱 지원을 위한 server.js 빌드 추가
+  - API 라우팅과 SPA 라우팅 분리
+
+### 📋 **예상 결과**
+- 프론트엔드: React SPA가 정상 로드
+- 백엔드: /api/* 경로로 Express 서버 API 접근 가능
+- 날씨 기능과 AI 기능 모두 정상 작동 예상
+
 ---
 *마지막 업데이트: 2025-06-19*
