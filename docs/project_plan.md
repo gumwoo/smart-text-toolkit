@@ -1,167 +1,191 @@
-# Smart Text Toolkit - 프로젝트 계획
+# App-OneStore 프로젝트 계획
 
-## 프로젝트 개요
-- **프로젝트명**: Smart Text Toolkit with Weather API Integration
-- **목적**: 텍스트 처리 기능과 공공 날씨 API를 통합한 웹 애플리케이션
-- **기술 스택**: Node.js, Express, React, OpenAI API, 기상청 공공데이터 API
+## 📋 프로젝트 개요
+- **프로젝트명**: App-OneStore
+- **구조**: React (Frontend) + Express.js (Backend) 
+- **배포 플랫폼**: Vercel
+- **현재 상태**: Vercel 배포 실패 문제 해결 중
 
-## 현재 상황 분석 (2025-06-17)
+## 🚨 현재 문제점 (Vercel 배포 실패)
 
-### 🔍 발견된 주요 문제점
-1. **공공 API 호출 실패**
-   - `/api/weather/forecast/short` - 404 오류
-   - `/api/weather/forecast/long` - 404 오류
-   - 로그에 지속적인 404 에러 발생
-
-2. **라우트 누락 문제**
-   - weather.js에 forecast 관련 라우트가 정의되지 않음
-   - 현재 정의된 라우트: `/current`, `/current-simple`, `/health`, `/test`
-   - 필요한 라우트: `/forecast/short`, `/forecast/long`
-
-3. **API 구조 분석**
-   - 현재 초단기실황조회(`getUltraSrtNcst`)만 구현됨
-   - 단기예보조회(`getVilageFcst`) 미구현
-   - 중기예보 관련 API 미구현
-
-## 해결해야 할 작업 목록
-
-### 🎯 즉시 해결 필요
-- [x] 단기예보 API 라우트 추가 (`/forecast/short`) ✅ 완료
-- [x] 중기예보 API 라우트 추가 (`/forecast/long`) ✅ 완료 (단기예보로 임시 대체)
-- [x] 기상청 API의 getVilageFcst 엔드포인트 구현 ✅ 완료
-- [ ] 프론트엔드에서 요청하는 라우트와 백엔드 라우트 일치 확인
-
-### 🔧 기술적 개선사항
-- [x] API 응답 데이터 파싱 및 정규화 ✅ 완료
-- [x] 오류 처리 및 로깅 개선 ✅ 완료
-- [ ] 프론트엔드와 백엔드 간의 데이터 형식 표준화
-- [ ] 실제 중기예보 API 연동 (현재는 단기예보로 대체)
-
-## 완료된 작업
-- ✅ 서버 기본 구조 설정
-- ✅ 초단기실황조회 API 구현
-- ✅ 단기예보조회 API 구현 (`/forecast/short`)
-- ✅ 중기예보조회 API 구현 (`/forecast/long` - 임시)
-- ✅ OpenAI 통합 기능 구현
-- ✅ 로깅 시스템 구축
-- ✅ CORS 설정 및 미들웨어 구성
-- ✅ 404 오류 원인 파악 및 해결
-- ✅ **GPT 마크다운 문법 제거 시스템 구현 (수정 완료)**
-  - 백엔드: 모든 OpenAI API 프롬프트에 **굵게**와 ###제목 사용 금지 지시 추가
-  - 프론트엔드: 모든 AI 응답 컴포넌트에 **굵게**와 ###제목 제거 함수 적용
-  - 사용자 요청에 맞게 **와 ### 이 두 개 마크다운 문법만 제거
-  - 원래 AI의 자연스러운 텍스트 흐름과 가독성 유지
-
-## 최근 해결사항 (2025-06-17)
-### ✅ 공공 API 호출 실패 문제 해결
-1. **누락된 라우트 추가**
-   - `/api/weather/forecast/short` 라우트 구현
-   - `/api/weather/forecast/long` 라우트 구현
+### 확인된 문제들
+1. **vercel.json 설정 문제**
+   - 현재 `builds` 속성을 사용하고 있으나, 이는 레거시 방식
+   - `@vercel/static-build` 설정이 올바르지 않을 수 있음
    
-2. **단기예보 API 구현**
-   - 기상청 getVilageFcst 엔드포인트 연동
-   - 3시간마다 발표되는 예보 시간 계산 로직 추가
-   - 날짜별, 시간별 데이터 그룹화 및 파싱
-   - 주요 기상 요소별 데이터 정리 (기온, 습도, 강수 등)
+2. **프로젝트 구조 문제**
+   - Frontend: `frontend/` 폴더
+   - Backend API: `api/` 폴더 
+   - 루트에 `server.js` 있음 (Express 서버)
 
-3. **데이터 구조화**
-   - 원본 데이터와 파싱된 데이터 모두 제공
-   - 사용자 친화적인 데이터 형식으로 변환
-   - 오류 처리 및 상세 로깅 추가
+3. **빌드 설정 문제**
+   - `installCommand`, `buildCommand`, `outputDirectory` 설정 검토 필요
+   - React build 폴더 경로 확인 필요
 
-## 다음 단계
-1. ✅ 단기예보 라우트 추가 완료
-2. ✅ API 테스트 도구 준비 완료
-3. ⚠️ **서버 재시작 필요** - 현재 실행 중인 서버가 수정된 코드를 반영하지 않음
-4. [ ] 프론트엔드 연동 확인
-5. [ ] 사용자 인터페이스 개선
-6. 🆕 **GPT 마크다운 문법 제거 작업 (수정 완료)**
-   - ✅ 백엔드: 모든 OpenAI API 프롬프트에 **굵게**와 ###제목 사용 금지 지시 추가 완료
-   - ✅ 프론트엔드: 모든 AI 응답 컴포넌트에 **굵게**와 ###제목 제거 함수 적용 완료
-   - ✅ 과도한 문단 나누기 제거하여 원래 가독성 유지
-   - ✅ 사용자 요청에 맞게 **와 ### 이 두 개 마크다운 문법만 제거하도록 수정 완료
+## 🔍 조사할 웹사이트 목록
 
-## 🚨 **최종 진단 결과**
+### 완료된 조사 (10개)
+1. ✅ Vercel 공식 문서 - Error Codes
+2. ✅ Vercel 공식 문서 - Troubleshooting Build Errors  
+3. ✅ Vercel 공식 문서 - Why aren't commits triggering deployments
+4. ✅ Vercel Status 페이지
+5. ✅ Vercel 공식 문서 - Error List
+6. ✅ Vercel 가이드 - Why is my deployed project showing a 404 error
+7. ✅ GitHub Discussion - vercel/next.js #50560 (배포 에러 사례)
+8. ✅ Vercel 공식 문서 - Managing Deployments
+9. ✅ Stack Overflow - Deploying NextJS to Vercel failed
+10. ✅ Vercel 공식 문서 - DEPLOYMENT_NOT_FOUND
 
-### ✅ **API 키 상태: 정상**
-- **Decoded 키**: 완전히 정상 작동 (NORMAL_SERVICE)
-- **Encoded 키**: 등록 오류 (SERVICE_KEY_IS_NOT_REGISTERED_ERROR)
-- **결론**: 현재 키로 정상 서비스 가능
+### 추가 조사 완료 (10개)
+11. ✅ Vercel 공식 문서 - Configuring projects with vercel.json
+12. ✅ Vercel 가이드 - How to Deploy an Express.js Application  
+13. ✅ Vercel 공식 문서 - Using Monorepos
+14. ✅ Stack Overflow - Deploying NX Monorepo with React/Express
+15. ✅ Vercel 가이드 - How to Deploy a Monorepo to Vercel Using Yarn
+16. ✅ Vercel 블로그 - Monorepos are changing how teams build
+17. ✅ Carlos Roso 블로그 - How to deploy a monorepo in Vercel
+18. ✅ Vercel 공식 문서 - Deploying Turborepo to Vercel
+19. ✅ Stack Overflow - How to deploy front and back end from same monorepo
+20. ✅ GitHub Issue - unclear how to do monorepo deployment of CRA
 
-### 🎯 **실제 문제: 서버 코드 미반영**
-- 포트 5000에서 **다른 프로젝트 서버** 실행 중
-- 수정된 weather.js 라우터가 로드되지 않음
-- 모든 API 코드 수정 완료되었으나 서버 재시작 필요
+## 📝 발견된 주요 해결책들
 
-### 📋 **즉시 실행 필요 사항**
-1. **현재 5000번 포트 서버 종료**
-2. **올바른 서버 실행**: `C:\app-onestore`에서 `npm run dev`
-3. **테스트 확인**: `http://localhost:5000/api/weather/forecast/short`
+### vercel.json 설정 문제
+- `builds` 속성 대신 새로운 설정 방식 사용 권장
+- Express.js는 `api/` 폴더에 serverless function으로 배치
+- React는 정적 빌드로 처리
 
-### 🎉 **예상 결과**
-서버 재시작 후 모든 공공 API 호출이 정상 작동할 것입니다!
+### 2단계: 해결책 구현 (진행중) 🔄
+- [x] 방안 A 선택 (Serverless Functions 방식)
+- [x] vercel.json 새로 작성 (레거시 builds 제거)
+- [x] package.json 수정 (Node.js 18.x 설정)
+- [x] Express.js API 로직을 Serverless Functions로 변환
+  - [x] `/api/health.js` - 헬스 체크
+  - [x] `/api/index.js` - 루트 API 엔드포인트
+  - [x] `/api/weather-advisor.js` - AI 날씨 조언
+  - [x] `/api/generate-quote.js` - 명언 생성
+  - [x] `/api/summarize-text.js` - 텍스트 요약
+  - [x] `/api/generate-email.js` - 이메일 생성
+  - [x] `/api/generate-creative.js` - 창의적 콘텐츠
+- [ ] server.js 파일 처리 결정 (유지 vs 제거)
+- [ ] 로컬 테스트
 
-## 📋 서버 재시작 후 확인사항
-1. `http://localhost:5000/health` - 서버 상태 확인
-2. `http://localhost:5000/api/weather/forecast/short` - 단기예보 API
-3. `http://localhost:5000/api/weather/forecast/long` - 중기예보 API
-4. `http://localhost:5000/api/weather/current` - 현재 날씨 API
+### 3단계: 테스트 및 배포
+- [ ] 로컬에서 빌드 테스트
+- [ ] Vercel CLI로 배포 테스트  
+- [ ] 문제 발생시 로그 분석
 
-## 🛠️ 문제 해결 방법
-1. **기존 서버 종료**: 현재 5000번 포트의 서버 프로세스 종료
-2. **올바른 서버 실행**: `C:\app-onestore` 폴더에서 `npm run dev` 또는 `node server.js`
-3. **API 테스트**: 브라우저에서 `C:\app-onestore\test-weather-api.html` 파일 열어서 테스트
+## 🎯 즉시 적용 가능한 솔루션
 
-## 🚀 Vercel 배포 설정 (2025-06-19)
+### 최우선 추천: 방안 A (Serverless Functions)
 
-### ✅ **배포 준비 완료**
-- vercel.json 파일 구성 완료
-- Build Command: `cd frontend && npm run build`
-- Install Command: `npm install && cd frontend && npm install`
-- Output Directory: `public` if it exists, or `.`
-- Framework Preset: Other
+**장점:**
+- Express.js 코드를 최소한으로 수정
+- 기존 API 구조 유지 가능
+- Vercel의 권장 방식
 
-### 🔑 **필요한 환경변수**
-- `OPENAI_API_KEY`: OpenAI API 키
-- `NODE_ENV`: production
+**단점:**
+- 일부 Express.js 기능 제한
+- Serverless 환경 적응 필요
 
-### 📂 **프로젝트 구조**
-- 루트: Express 서버 (server.js)
-- frontend/: React 애플리케이션
-- api/: Vercel Serverless Functions
-- vercel.json: 배포 설정 완료
+**구현 순서:**
+1. 새로운 `vercel.json` 작성
+2. `server.js`의 API 로직을 `api/` 폴더로 이동
+3. React 빌드 설정 조정
+4. 테스트 및 배포
 
-### 🔧 **ESLint 오류 수정 완료 (2025-06-19)**
-- ✅ React Hook Dependencies 오류 수정:
-  - WeatherAdvisor.js: useEffect에 누락된 dependencies 추가
-  - WeatherCurrent.js: useEffect에 누락된 dependencies 추가
-  - loadCurrentWeather, generateAIAdvice 함수를 useCallback으로 래핑
-- ✅ Switch문 Default Case 오류 수정:
-  - weatherAPI.js의 3개 switch문에 default case 추가
-- ✅ Anonymous Default Export 오류 수정:
-  - weatherAPI.js에서 인스턴스를 변수에 할당 후 export
+## 📚 핵심 참고 자료 (검증된)
 
-### 🎯 **다음 배포 시도 준비 완료**
-- 모든 ESLint 오류 해결
-- CI=true 환경에서 빌드 성공 예상
+### Vercel 공식 가이드
+- [Express.js on Vercel](https://vercel.com/guides/using-express-with-vercel)
+- [React on Vercel](https://vercel.com/guides/deploying-react-with-vercel)
+- [Project Configuration](https://vercel.com/docs/project-configuration)
 
-### 🔧 **404 오류 해결 (2025-06-19)**
-- ✅ **문제 진단**: 로컬 vs Vercel 환경 차이
-  - 로컬: CI=false (ESLint 경고만 표시)
-  - Vercel: CI=true (ESLint 경고를 오류로 처리)
-- ✅ **빌드 오류 해결**: 
-  - frontend/.env에 CI=false 설정
-  - package.json build 스크립트 수정
-- ✅ **배포 성공**: ESLint 오류 해결로 빌드 통과
-- 🔄 **404 오류 해결 시도**:
-  - vercel.json 라우팅 설정 수정
-  - 풀스택 앱 지원을 위한 server.js 빌드 추가
-  - API 라우팅과 SPA 라우팅 분리
+### 실제 사례
+- [Carlos Roso의 Monorepo 배포 사례](https://carlosroso.com/how-to-deploy-a-monorepo-in-vercel/)
+- [Stack Overflow 검증된 답변들](https://stackoverflow.com/questions/78771856/what-should-my-vercel-json-config-file-to-deploy-my-mern-stack-given-my-current)
 
-### 📋 **예상 결과**
-- 프론트엔드: React SPA가 정상 로드
-- 백엔드: /api/* 경로로 Express 서버 API 접근 가능
-- 날씨 기능과 AI 기능 모두 정상 작동 예상
+## 🔧 해야할 작업
+
+### 1단계: 추가 웹사이트 조사 (완료) ✅
+- [x] 20개 웹사이트 조사 완료
+- [x] 각 웹사이트에서 솔루션 정보 수집 완료
+- [x] 우리 프로젝트에 적용 가능한 해결책 정리 완료
+
+## 🚨 분석 결과 - 주요 문제점 발견
+
+### 문제 1: vercel.json 설정 오류
+**현재 문제:**
+- `builds` 속성 사용 (레거시 방식)
+- `@vercel/static-build` 설정 부정확
+- Express.js 서버와 API 함수 중복 정의
+
+**해결책:** 
+- `builds` 제거하고 새로운 방식 사용
+- React는 자동 감지로 빌드
+- Express.js는 Serverless Functions로 변환
+
+### 문제 2: 프로젝트 구조 혼재
+**현재 구조:**
+```
+프로젝트 루트/
+├── server.js (Express 서버)
+├── api/ (Serverless Functions)
+├── frontend/ (React 앱)
+└── vercel.json
+```
+
+**문제점:**
+- Express 서버와 API 함수가 동시 존재
+- Vercel에서는 둘 중 하나만 사용해야 함
+- 빌드 명령어 충돌
+
+### 문제 3: 환경 설정 불일치
+- Node.js 버전 설정 필요
+- 환경변수 처리 문제
+- CORS 설정 충돌
+
+## 💡 권장 해결 방안 (웹 조사 기반)
+
+### 방안 A: Serverless Functions 방식 (권장)
+```json
+{
+  "version": 2,
+  "framework": "create-react-app",
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/build",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+### 방안 B: 별도 프로젝트 분리
+- Frontend: 별도 Vercel 프로젝트
+- Backend: 별도 Vercel 프로젝트
+- Monorepo 방식으로 관리
+
+### 방안 C: Express.js 완전 제거
+- `server.js` 삭제
+- 모든 API를 `api/` 폴더의 개별 함수로 변환
+- React Router로 SPA 라우팅 처리
+
+## 🎯 목표
+- Vercel에서 React + Express.js 앱 성공적으로 배포
+- API 라우팅 정상 동작 확인
+- 프론트엔드-백엔드 통신 정상화
+
+## 📚 참고 자료
+- [Vercel 공식 문서](https://vercel.com/docs)
+- [Express.js on Vercel 가이드](https://vercel.com/guides/using-express-with-vercel)
+- [React on Vercel 가이드](https://vercel.com/guides/deploying-react-with-vercel)
 
 ---
 *마지막 업데이트: 2025-06-19*

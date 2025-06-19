@@ -1,9 +1,36 @@
 const OpenAI = require('openai');
+const fs = require('fs-extra');
+const path = require('path');
 
 // OpenAI 클라이언트 설정
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// 로그 디렉토리 확인 및 생성
+const logDir = path.join(process.cwd(), 'logs');
+
+const logInfo = (message) => {
+  const logMessage = `[${new Date().toISOString()}] INFO: ${message}\n`;
+  console.log(logMessage.trim());
+  try {
+    fs.ensureDirSync(logDir);
+    fs.appendFileSync(path.join(logDir, 'app.log'), logMessage);
+  } catch (error) {
+    console.warn('로그 파일 쓰기 실패:', error.message);
+  }
+};
+
+const logError = (message) => {
+  const logMessage = `[${new Date().toISOString()}] ERROR: ${message}\n`;
+  console.error(logMessage.trim());
+  try {
+    fs.ensureDirSync(logDir);
+    fs.appendFileSync(path.join(logDir, 'error.log'), logMessage);
+  } catch (error) {
+    console.warn('에러 로그 파일 쓰기 실패:', error.message);
+  }
+};
 
 module.exports = async function handler(req, res) {
   // CORS 설정
@@ -23,6 +50,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const { weatherData, advisorType = 'outfit' } = req.body;
+    
+    logInfo(`AI 날씨 조언 요청: 타입=${advisorType}, 온도=${weatherData?.temperature}, 습도=${weatherData?.humidity}`);
     
     if (!weatherData) {
       return res.status(400).json({ error: '날씨 데이터가 필요합니다.' });
@@ -94,6 +123,8 @@ module.exports = async function handler(req, res) {
 
     const advice = completion.choices[0].message.content.trim();
     
+    logInfo(`AI 날씨 조언 생성 완료: ${advice.substring(0, 50)}...`);
+    
     res.json({ 
       advice,
       advisorType,
@@ -102,7 +133,7 @@ module.exports = async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('AI 날씨 조언 생성 오류:', error);
+    logError(`AI 날씨 조언 생성 오류: ${error.message}`);
     res.status(500).json({ error: 'AI 날씨 조언 생성 중 오류가 발생했습니다.' });
   }
 }

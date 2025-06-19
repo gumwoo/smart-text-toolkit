@@ -1,9 +1,36 @@
 const OpenAI = require('openai');
+const fs = require('fs-extra');
+const path = require('path');
 
 // OpenAI 클라이언트 설정
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// 로그 디렉토리 확인 및 생성
+const logDir = path.join(process.cwd(), 'logs');
+
+const logInfo = (message) => {
+  const logMessage = `[${new Date().toISOString()}] INFO: ${message}\n`;
+  console.log(logMessage.trim());
+  try {
+    fs.ensureDirSync(logDir);
+    fs.appendFileSync(path.join(logDir, 'app.log'), logMessage);
+  } catch (error) {
+    console.warn('로그 파일 쓰기 실패:', error.message);
+  }
+};
+
+const logError = (message) => {
+  const logMessage = `[${new Date().toISOString()}] ERROR: ${message}\n`;
+  console.error(logMessage.trim());
+  try {
+    fs.ensureDirSync(logDir);
+    fs.appendFileSync(path.join(logDir, 'error.log'), logMessage);
+  } catch (error) {
+    console.warn('에러 로그 파일 쓰기 실패:', error.message);
+  }
+};
 
 module.exports = async function handler(req, res) {
   // CORS 설정
@@ -23,6 +50,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const { text, length } = req.body;
+    
+    logInfo(`텍스트 요약 요청: 길이=${length}, 텍스트길이=${text ? text.length : 0}`);
     
     if (!text || text.trim().length < 50) {
       return res.status(400).json({ error: '최소 50자 이상의 텍스트가 필요합니다.' });
@@ -63,10 +92,12 @@ module.exports = async function handler(req, res) {
 
     const summary = completion.choices[0].message.content.trim();
     
+    logInfo(`텍스트 요약 완료: ${summary.substring(0, 50)}...`);
+    
     res.json({ summary });
     
   } catch (error) {
-    console.error('텍스트 요약 오류:', error);
+    logError(`텍스트 요약 오류: ${error.message}`);
     res.status(500).json({ error: '텍스트 요약 중 오류가 발생했습니다.' });
   }
 }
