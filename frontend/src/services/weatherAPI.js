@@ -118,6 +118,9 @@ class WeatherAPIService {
         case 'WSD': // 풍속
           weather.windSpeed = `${item.obsrValue}m/s`;
           break;
+        default:
+          // 알 수 없는 카테고리 무시
+          break;
       }
     });
     
@@ -185,6 +188,9 @@ class WeatherAPIService {
           break;
         case 'LGT': // 낙뢰
           forecastMap[timeKey].data.lightning = `${item.fcstValue}kA`;
+          break;
+        default:
+          // 알 수 없는 카테고리 무시
           break;
       }
     });
@@ -256,6 +262,9 @@ class WeatherAPIService {
             forecastMap[date].data.rainProbability = `${item.fcstValue}%`;
           }
           break;
+        default:
+          // 알 수 없는 카테고리 무시
+          break;
       }
     });
     
@@ -291,4 +300,6 @@ class WeatherAPIService {
   }
 }
 
-export default new WeatherAPIService();
+// WeatherAPIService 인스턴스 생성 및 export
+const weatherAPIService = new WeatherAPIService();
+export default weatherAPIService;

@@ -112,5 +112,38 @@
 2. **올바른 서버 실행**: `C:\app-onestore` 폴더에서 `npm run dev` 또는 `node server.js`
 3. **API 테스트**: 브라우저에서 `C:\app-onestore\test-weather-api.html` 파일 열어서 테스트
 
+## 🚀 Vercel 배포 설정 (2025-06-19)
+
+### ✅ **배포 준비 완료**
+- vercel.json 파일 구성 완료
+- Build Command: `cd frontend && npm run build`
+- Install Command: `npm install && cd frontend && npm install`
+- Output Directory: `public` if it exists, or `.`
+- Framework Preset: Other
+
+### 🔑 **필요한 환경변수**
+- `OPENAI_API_KEY`: OpenAI API 키
+- `NODE_ENV`: production
+
+### 📂 **프로젝트 구조**
+- 루트: Express 서버 (server.js)
+- frontend/: React 애플리케이션
+- api/: Vercel Serverless Functions
+- vercel.json: 배포 설정 완료
+
+### 🔧 **ESLint 오류 수정 완료 (2025-06-19)**
+- ✅ React Hook Dependencies 오류 수정:
+  - WeatherAdvisor.js: useEffect에 누락된 dependencies 추가
+  - WeatherCurrent.js: useEffect에 누락된 dependencies 추가
+  - loadCurrentWeather, generateAIAdvice 함수를 useCallback으로 래핑
+- ✅ Switch문 Default Case 오류 수정:
+  - weatherAPI.js의 3개 switch문에 default case 추가
+- ✅ Anonymous Default Export 오류 수정:
+  - weatherAPI.js에서 인스턴스를 변수에 할당 후 export
+
+### 🎯 **다음 배포 시도 준비 완료**
+- 모든 ESLint 오류 해결
+- CI=true 환경에서 빌드 성공 예상
+
 ---
-*마지막 업데이트: 2025-06-17*
+*마지막 업데이트: 2025-06-19*

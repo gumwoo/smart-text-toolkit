@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import weatherAPI from '../../services/weatherAPI';
 import { API_ENDPOINTS } from '../../config/api';
 
@@ -42,7 +42,7 @@ const WeatherAdvisor = ({ nx, ny }) => {
   };
 
   // 현재 날씨 데이터 로드
-  const loadCurrentWeather = async () => {
+  const loadCurrentWeather = useCallback(async () => {
     try {
       console.log('[WeatherAdvisor] 현재 날씨 데이터 조회 시작');
       setError(null);
@@ -55,10 +55,10 @@ const WeatherAdvisor = ({ nx, ny }) => {
       console.error('[WeatherAdvisor] 현재 날씨 조회 실패:', err);
       setError('현재 날씨 정보를 가져올 수 없습니다.');
     }
-  };
+  }, [nx, ny]);
 
   // AI 조언 생성
-  const generateAIAdvice = async (weatherData, type) => {
+  const generateAIAdvice = useCallback(async (weatherData, type) => {
     try {
       console.log('[WeatherAdvisor] AI 조언 생성 시작:', type);
       setIsGeneratingAdvice(true);
@@ -98,7 +98,7 @@ const WeatherAdvisor = ({ nx, ny }) => {
     } finally {
       setIsGeneratingAdvice(false);
     }
-  };
+  }, []);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -109,14 +109,14 @@ const WeatherAdvisor = ({ nx, ny }) => {
     };
     
     initializeData();
-  }, [nx, ny]);
+  }, [nx, ny, loadCurrentWeather]);
 
   // 현재 날씨가 로드되면 AI 조언 생성
   useEffect(() => {
     if (currentWeather && !aiAdvice) {
       generateAIAdvice(currentWeather, advisorType);
     }
-  }, [currentWeather]);
+  }, [currentWeather, aiAdvice, advisorType, generateAIAdvice]);
 
   // 조언 타입 변경시 AI 조언 재생성
   const handleAdvisorTypeChange = (newType) => {

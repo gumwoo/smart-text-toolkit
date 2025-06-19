@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import weatherAPI from '../../services/weatherAPI';
 
 const WeatherCurrent = ({ nx, ny }) => {
@@ -8,7 +8,7 @@ const WeatherCurrent = ({ nx, ny }) => {
   const [lastUpdated, setLastUpdated] = useState(null);
 
   // 현재 날씨 데이터 로드
-  const loadCurrentWeather = async () => {
+  const loadCurrentWeather = useCallback(async () => {
     try {
       console.log('[WeatherCurrent] 현재 날씨 조회 시작');
       setLoading(true);
@@ -29,7 +29,7 @@ const WeatherCurrent = ({ nx, ny }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [nx, ny]);
 
   useEffect(() => {
     loadCurrentWeather();
@@ -38,7 +38,7 @@ const WeatherCurrent = ({ nx, ny }) => {
     const interval = setInterval(loadCurrentWeather, 10 * 60 * 1000);
     
     return () => clearInterval(interval);
-  }, [nx, ny]);
+  }, [nx, ny, loadCurrentWeather]);
 
   // 새로고침 버튼 핸들러
   const handleRefresh = () => {
