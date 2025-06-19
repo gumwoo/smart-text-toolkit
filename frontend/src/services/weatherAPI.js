@@ -73,7 +73,7 @@ class WeatherAPIService {
   async getShortTermForecast(nx = null, ny = null) {
     const coords = { nx: nx || this.defaultCoords.nx, ny: ny || this.defaultCoords.ny };
     
-    const data = await this.fetchWeatherData('forecast/short', coords);
+    const data = await this.fetchWeatherData('short', coords);
     return this.parseShortTermForecast(data);
   }
 
@@ -81,12 +81,18 @@ class WeatherAPIService {
   async getLongTermForecast(nx = null, ny = null) {
     const coords = { nx: nx || this.defaultCoords.nx, ny: ny || this.defaultCoords.ny };
     
-    const data = await this.fetchWeatherData('forecast/long', coords);
+    const data = await this.fetchWeatherData('long', coords);
     return this.parseLongTermForecast(data);
   }
 
   // 현재 날씨 데이터 파싱
   parseCurrentWeather(data) {
+    // 백엔드 API가 이미 파싱된 데이터를 반환하는 경우
+    if (data && typeof data === 'object' && data.temperature) {
+      return data;
+    }
+    
+    // 원본 기상청 API 형식인 경우 (fallback)
     if (!data?.items?.item) {
       console.warn('[WeatherAPI] 실황 데이터가 없습니다');
       return null;
@@ -135,6 +141,12 @@ class WeatherAPIService {
   parseShortTermForecast(data) {
     console.log('[WeatherAPI] 초단기예보 원본 데이터:', data);
     
+    // 백엔드가 이미 파싱된 배열을 반환하는 경우
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    // 원본 기상청 API 형식인 경우 (fallback)
     if (!data?.items?.item) {
       console.warn('[WeatherAPI] 초단기예보 데이터가 없습니다:', data);
       return [];
@@ -213,6 +225,12 @@ class WeatherAPIService {
   parseLongTermForecast(data) {
     console.log('[WeatherAPI] 단기예보 원본 데이터:', data);
     
+    // 백엔드가 이미 파싱된 배열을 반환하는 경우
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    // 원본 기상청 API 형식인 경우 (fallback)
     if (!data?.items?.item) {
       console.warn('[WeatherAPI] 단기예보 데이터가 없습니다:', data);
       return [];
