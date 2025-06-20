@@ -7,7 +7,7 @@ const API_KEYS = {
   decoded: 'Lmc1Zq9hmKIACiZKiXehoeHi1ac4HG25EqROFy//OkLBLhn5EWFL0X38pRF+FWvlRuRHJx7N79cf7zcsRUz+NA=='
 };
 
-// 현재 날짜/시간
+// 현재 날짜/시간 
 const now = new Date();
 const year = now.getFullYear();
 const month = String(now.getMonth() + 1).padStart(2, '0');
