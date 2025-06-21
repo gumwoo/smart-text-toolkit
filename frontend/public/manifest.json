@@ -9,26 +9,23 @@
       "type": "image/x-icon"
     },
     {
-      "src": "favicon.ico",
-      "type": "image/svg+xml",
-      "sizes": "any"
-    },
-    {
       "src": "logo192.png",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
       "src": "logo512.png",
-      "type": "image/svg+xml", 
+      "type": "image/png", 
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#667eea",
   "background_color": "#ffffff",
   "orientation": "portrait-primary",
   "categories": ["productivity", "utilities"],
-  "lang": "ko-KR"
+  "lang": "ko-KR",
+  "prefer_related_applications": false
 }
